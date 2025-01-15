@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tablette Elio</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1e272e;
+            color: #ecf0f1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+        }
+
+        header {
+            width: 100%;
+            background: #2f3640;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8em;
+            color: #f5f6fa;
+        }
+
+        nav {
+            display: flex;
+            gap: 15px;
+        }
+
+        nav a {
+            color: #ecf0f1;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            background: #00a8ff;
+        }
+
+        .container {
+            text-align: center;
+            background: #2f3640;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 600px;
+            margin-top: 100px;
+        }
+
+        h2 {
+            font-size: 2em;
+            margin-bottom: 25px;
+            color: #dcdde1;
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .button {
+            display: inline-block;
+            background: #00a8ff;
+            color: #fff;
+            padding: 15px 25px;
+            text-decoration: none;
+            font-size: 1.2em;
+            border-radius: 8px;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .button:hover {
+            background: #0097e6;
+            transform: translateY(-3px);
+        }
+
+        .iframe-container {
+            width: 100%;
+            max-width: 1920px;
+            margin: 0 auto;
+            display: none;
+            text-align: center;
+            margin-top: 70px;
+            overflow: hidden;
+        }
+
+        iframe {
+            width: 100%;
+            height: calc(100vh - 70px);
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #e1b12c;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Tablette Elio</h1>
+        <nav>
+            <a href="#" onclick="goToHome()">Accueil</a>
+            <a href="#compta-ammunation" onclick="showIframe('https://docs.google.com/spreadsheets/d/1NcLIzfDWXKGEO3dHarK_4xv23OmX2NZgiC9XmnkHjBA/edit?gid=0#gid=0')">Compta Ammunation</a>
+            <a href="#compta-ltd-sandy" onclick="showIframe('https://docs.google.com/spreadsheets/d/10mjl3R8rJtF4N7jAYWDpTBXCdNABl9e5Ui3sebeXQws/edit?gid=575630313#gid=575630313')">Compta LTD Sandy</a>
+            <a href="#compta-flamingo" onclick="showIframe('https://docs.google.com/spreadsheets/d/1hIQ8XqRSDvOZyykFiMKldYrrRcKpfdiiyiFpZl7DRo0/edit?gid=2082676256#gid=2082676256')">Compta Flamingo</a>
+        </nav>
+    </header>
+    <div id="home" class="container">
+        <h2>Le futur millionnaire de cette ville</h2>
+        <div class="buttons">
+            <a href="#compta-ammunation" class="button" onclick="showIframe('https://docs.google.com/spreadsheets/d/1NcLIzfDWXKGEO3dHarK_4xv23OmX2NZgiC9XmnkHjBA/edit?gid=0#gid=0')">Compta Ammunation</a>
+            <a href="#compta-ltd-sandy" class="button" onclick="showIframe('https://docs.google.com/spreadsheets/d/10mjl3R8rJtF4N7jAYWDpTBXCdNABl9e5Ui3sebeXQws/edit?gid=575630313#gid=575630313')">Compta LTD Sandy</a>
+            <a href="#compta-flamingo" class="button" onclick="showIframe('https://docs.google.com/spreadsheets/d/1hIQ8XqRSDvOZyykFiMKldYrrRcKpfdiiyiFpZl7DRo0/edit?gid=2082676256#gid=2082676256')">Compta Flamingo</a>
+        </div>
+        <div class="footer">Si c'est pas à toi touche pas bâtard.</div>
+    </div>
+    <div class="iframe-container">
+        <iframe id="iframe" src=""></iframe>
+    </div>
+
+    <script>
+        function showIframe(url) {
+            const home = document.getElementById('home');
+            const iframeContainer = document.querySelector('.iframe-container');
+            const iframe = document.getElementById('iframe');
+
+            home.style.display = 'none';
+            iframe.src = url;
+            iframeContainer.style.display = 'block';
+        }
+
+        function goToHome() {
+            const home = document.getElementById('home');
+            const iframeContainer = document.querySelector('.iframe-container');
+            const iframe = document.getElementById('iframe');
+
+            iframe.src = '';
+            iframeContainer.style.display = 'none';
+            home.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
