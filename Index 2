@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Tablet Arcade RP</title>
+
+<style>
+body{
+  margin:0;
+  font-family: Arial, sans-serif;
+  background: radial-gradient(circle at top, #0b1220, #05070f);
+  color:white;
+}
+
+/* ===== TABLET LAYOUT ===== */
+.wrapper{
+  max-width:900px;
+  margin:40px auto;
+  padding:20px;
+}
+
+/* HEADER */
+.header{
+  font-size:22px;
+  font-weight:600;
+  text-align:center;
+  margin-bottom:20px;
+  letter-spacing:2px;
+  color:#7dd3fc;
+}
+
+/* DASHBOARD */
+.dashboard{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:15px;
+}
+
+/* GLASS CARD */
+.card{
+  width:160px;
+  height:120px;
+  border-radius:16px;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(12px);
+  border:1px solid rgba(125,211,252,0.2);
+  box-shadow: 0 0 20px rgba(56,189,248,0.15);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.card:hover{
+  transform:scale(1.05);
+  box-shadow:0 0 25px rgba(56,189,248,0.35);
+}
+
+.card span{
+  font-size:14px;
+  color:#bae6fd;
+}
+
+/* CANVAS */
+canvas{
+  display:block;
+  margin:20px auto;
+  background:#05070f;
+  border-radius:16px;
+  border:1px solid rgba(125,211,252,0.2);
+  box-shadow:0 0 30px rgba(56,189,248,0.1);
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+  <div class="header">TABLET ARCADE // RP SYSTEM</div>
+
+  <div class="dashboard">
+    <div class="card" onclick="startSnake()">🐍<span>Snake</span></div>
+    <div class="card" onclick="startPong()">🏓<span>Pong</span></div>
+    <div class="card" onclick="startFlappy()">🐤<span>Flappy</span></div>
+    <div class="card" onclick="startTetris()">🧱<span>Tetris</span></div>
+    <div class="card" onclick="startBreakout()">🟡<span>Breakout</span></div>
+  </div>
+
+  <canvas id="game" width="400" height="400"></canvas>
+</div>
+
+<script>
+const c=document.getElementById("game");
+const ctx=c.getContext("2d");
+let loop;
+
+// RESET
+function reset(){
+  clearInterval(loop);
+  document.onkeydown=null;
+  document.onmousemove=null;
+}
+
+// DRAW STYLE (GLASS UI DARK)
+function clear(){
+  ctx.fillStyle="#05070f";
+  ctx.fillRect(0,0,400,400);
+}
+
+// ================= SNAKE =================
+function startSnake(){
+reset();
+let s=[{x:200,y:200}],d={x:20,y:0},f=rand();
+
+document.onkeydown=e=>{
+if(e.key==="ArrowUp")d={x:0,y:-20};
+if(e.key==="ArrowDown")d={x:0,y:20};
+if(e.key==="ArrowLeft")d={x:-20,y:0};
+if(e.key==="ArrowRight")d={x:20,y:0};
+};
+
+loop=setInterval(()=>{
+let h={x:s[0].x+d.x,y:s[0].y+d.y};
+if(h.x<0||h.y<0||h.x>=400||h.y>=400) return startSnake();
+
+s.unshift(h);
+if(h.x===f.x&&h.y===f.y) f=rand();
+else s.pop();
+
+render();
+draw(f.x,f.y,"#38bdf8");
+s.forEach(p=>draw(p.x,p.y,"#7dd3fc"));
+},90);
+}
+
+// ================= PONG =================
+function startPong(){
+reset();
+let b={x:200,y:200,vx:3,vy:3},p=160,a=160;
+
+document.onmousemove=e=>{
+let r=c.getBoundingClientRect();
+p=e.clientY-r.top-40;
+};
+
+loop=setInterval(()=>{
+b.x+=b.vx;b.y+=b.vy;
+if(b.y<0||b.y>400)b.vy*=-1;
+
+a+=(b.y-a-40)*0.05;
+
+if(b.x<20&&b.y>p&&b.y<p+80)b.vx*=-1;
+if(b.x>380&&b.y>a&&b.y<a+80)b.vx*=-1;
+
+if(b.x<0||b.x>400) return startPong();
+
+render();
+draw(10,p,"#7dd3fc",10,80);
+draw(380,a,"#7dd3fc",10,80);
+draw(b.x,b.y,"#38bdf8");
+},16);
+}
+
+// ================= FLAPPY =================
+function startFlappy(){
+reset();
+let b={x:80,y:200,vy:0};
+let pipes=[{x:400,h:150}];
+
+document.onkeydown=()=>b.vy=-6;
+
+loop=setInterval(()=>{
+b.vy+=0.35;
+b.y+=b.vy;
+
+if(Math.random()<0.02)pipes.push({x:400,h:120+Math.random()*150});
+pipes.forEach(p=>p.x-=2);
+
+if(b.y<0||b.y>400) return startFlappy();
+
+pipes.forEach(p=>{
+if(p.x<100&&p.x>60){
+if(b.y<p.h||b.y>p.h+120) return startFlappy();
+}});
+
+render();
+draw(b.x,b.y,"#fbbf24");
+pipes.forEach(p=>{
+draw(p.x,0,"#22c55e",20,p.h);
+draw(p.x,p.h+120,"#22c55e",20,400);
+});
+},20);
+}
+
+// ================= TETRIS =================
+function startTetris(){
+reset();
+let g=Array(20).fill().map(()=>Array(10).fill(0));
+let p={x:4,y:0};
+
+document.onkeydown=e=>{
+if(e.key==="ArrowLeft")p.x--;
+if(e.key==="ArrowRight")p.x++;
+if(e.key==="ArrowDown")p.y++;
+};
+
+loop=setInterval(()=>{
+p.y++;
+if(p.y>19){g[19][p.x]=1;p={x:4,y:0};}
+
+render();
+for(let y=0;y<20;y++)
+for(let x=0;x<10;x++)
+if(g[y][x])draw(x*20,y*20,"#38bdf8",20,20);
+
+draw(p.x*20,p.y*20,"#7dd3fc");
+},180);
+}
+
+// ================= BREAKOUT =================
+function startBreakout(){
+reset();
+let b={x:200,y:250,vx:3,vy:-3};
+let px=150;
+let bricks=[];
+
+for(let y=0;y<5;y++)
+for(let x=0;x<8;x++)
+bricks.push({x:x*45+10,y:y*25+20,alive:true});
+
+document.onmousemove=e=>{
+let r=c.getBoundingClientRect();
+px=e.clientX-r.left-40;
+};
+
+loop=setInterval(()=>{
+b.x+=b.vx;b.y+=b.vy;
+
+if(b.x<0||b.x>400)b.vx*=-1;
+if(b.y<0)b.vy*=-1;
+
+if(b.y>370&&b.x>px&&b.x<px+80)b.vy*=-1;
+if(b.y>400)return startBreakout();
+
+bricks.forEach(bl=>{
+if(bl.alive&&b.x>bl.x&&b.x<bl.x+40&&b.y>bl.y&&b.y<bl.y+20){
+bl.alive=false;b.vy*=-1;
+}});
+
+render();
+draw(px,380,"#7dd3fc",80,10);
+draw(b.x,b.y,"#38bdf8");
+
+bricks.forEach(bl=>{
+if(bl.alive)draw(bl.x,bl.y,"#0ea5e9",40,20);
+});
+},16);
+}
+
+// ================= UTILS =================
+function draw(x,y,c,w=20,h=20){
+ctx.fillStyle=c;
+ctx.fillRect(x,y,w,h);
+}
+
+function render(){
+clear();
+}
+
+function rand(){
+return{x:Math.floor(Math.random()*20)*20,y:Math.floor(Math.random()*20)*20};
+}
+</script>
+
+</body>
+</html>
