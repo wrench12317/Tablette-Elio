@@ -42,6 +42,14 @@ const game = {
 };
 
 let audioCtx;
+let audioEnabled = true;
+
+function getAudioContext(){
+  if(!audioCtx){
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  return audioCtx;
+}
 function playClickSound(){
   if(!audioEnabled) return;
 
@@ -80,9 +88,20 @@ function log(msg){const d=document.createElement('div');d.textContent='• '+msg
 function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;$('#toastLayer').appendChild(t);setTimeout(()=>t.remove(),2600)}
 function floating(x,y,text){const f=document.createElement('div');f.className='floating';f.textContent=text;f.style.left=x+'px';f.style.top=y+'px';$('#floatLayer').appendChild(f);setTimeout(()=>f.remove(),850)}
 
-function clickCookie(e){game.cookies+=game.cpc;game.totalBaked+=game.cpc;game.totalClicks++;beep(520,.03,.18);floating(e.clientX-8,e.clientY-12,'+'+fmt(game.cpc));checkAchievements();}
-function buyBuilding(id){const b=BUILDINGS.find(x=>x.id===id); let qty=game.buyMode==='max'?maxAffordable(b).n:Number(game.buyMode); if(!qty)return; const price=game.buyMode==='max'?maxAffordable(b).total:costFor(b,qty); if(price>game.cookies)return; game.cookies-=price; game.buildings[id].count+=qty; recalc(); game.dirtyShop=true; beep(220,.07,.25); log(`Acheté ${qty} x ${b.name}`); checkAchievements();}
-function buyUpgrade(id){const u=UPGRADES.find(x=>x.id===id); if(!u||game.upgrades[id]||game.cookies<u.cost||!u.unlock(game))return; game.cookies-=u.cost; game.upgrades[id]=true; u.effect(game); recalc(); game.dirtyShop=true; beep(700,.09,.28); toast('⭐ Amélioration : '+u.name); log('Amélioration : '+u.name);}
+function clickCookie(e){
+  game.cookies += game.cpc;
+  game.totalBaked += game.cpc;
+  game.totalClicks++;
+
+  game.dirtyShop = true;
+
+  playClickSound();
+
+  floating(e.clientX - 8, e.clientY - 12, '+' + fmt(game.cpc));
+  checkAchievements();
+}
+function buyBuilding(id){const b=BUILDINGS.find(x=>x.id===id); let qty=game.buyMode==='max'?maxAffordable(b).n:Number(game.buyMode); if(!qty)return; const price=game.buyMode==='max'?maxAffordable(b).total:costFor(b,qty); if(price>game.cookies)return; game.cookies-=price; game.buildings[id].count+=qty; recalc(); game.dirtyShop=true; playClickSound(); log(`Acheté ${qty} x ${b.name}`); checkAchievements();}
+function buyUpgrade(id){const u=UPGRADES.find(x=>x.id===id); if(!u||game.upgrades[id]||game.cookies<u.cost||!u.unlock(game))return; game.cookies-=u.cost; game.upgrades[id]=true; u.effect(game); recalc(); game.dirtyShop=true; playClickSound(); toast('⭐ Amélioration : '+u.name); log('Amélioration : '+u.name);}
 function checkAchievements(){let changed=false; for(const a of ACHIEVEMENTS){if(!game.achievements[a.id]&&a.done(game)){game.achievements[a.id]=true;changed=true;toast('🏆 '+a.name);log('Succès débloqué : '+a.name)}} if(changed)game.dirtyAch=true;}
 
 function renderShop(){const shop=$('#shop'); shop.innerHTML=''; for(const b of BUILDINGS){const cost=game.buyMode==='max'?maxAffordable(b).total:costFor(b,Number(game.buyMode)); const div=document.createElement('div'); div.className='building'+(game.cookies<cost||!cost?' disabled':''); div.onclick=()=>buyBuilding(b.id); div.innerHTML=`<div class="b-icon">${b.icon}</div><div><div class="b-name">${b.name}</div><div class="b-desc">${b.desc}</div><div class="b-cost">${fmt(cost||buildingCost(b))} 🍪 • ${fmt(b.baseCps*game.buildings[b.id].mult)}/s</div></div><div class="b-owned">${game.buildings[b.id].count}</div>`; shop.appendChild(div)} for(const u of UPGRADES){if(!u.unlock(game))continue; const div=document.createElement('div'); const affordable =
