@@ -42,3 +42,24 @@
     filter:brightness(1.08);
 
 }
+@keyframes affordableGlow{
+
+    0%{
+        box-shadow:0 0 8px rgba(255,210,90,.25);
+    }
+
+    50%{
+        box-shadow:0 0 22px rgba(255,210,90,.75);
+    }
+
+    100%{
+        box-shadow:0 0 8px rgba(255,210,90,.25);
+    }
+
+}
+
+.building.upgrade.affordable{
+
+    animation:affordableGlow 1.2s infinite;
+
+}
