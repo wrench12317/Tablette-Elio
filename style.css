@@ -23,3 +23,22 @@
 .building.affordable:hover{
   filter:brightness(1.15);
 }
+.building.upgrade.affordable{
+
+    background:linear-gradient(180deg,#8a6a2c,#6d4d16);
+
+    border:2px solid #ffd86a;
+
+    box-shadow:
+        0 0 15px rgba(255,210,90,.35),
+        inset 0 0 10px rgba(255,255,180,.08);
+
+}
+
+.building.upgrade.affordable:hover{
+
+    transform:scale(1.02);
+
+    filter:brightness(1.08);
+
+}
